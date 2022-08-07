@@ -18,6 +18,7 @@ app_secret = os.environ["APP_SECRET"]
 user_id = os.environ["USER_ID"]
 template_id = os.environ["TEMPLATE_ID"]
 
+weekday_dict = {1:u"一",2:u"二",3:u"三",4:u"四",5:u"五",6:u"六",7:u"天"}
 
 def get_weather():
   url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
@@ -52,11 +53,19 @@ def air_color(q):
     else :
         return '#B22222'
 
+def get_today():
+    year = str(date.today().year)
+    month = str(date.today().month)
+    day = str(date.today().day)
+    weekday = weekday_dict[date.today().weekday()+1]
+    
+    return year+'年'+month+'月'+day+'日'+' 星期'+weekday
+
 
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
 weather, temperature, airData, airQuality = get_weather()
-data = {"weather":{"value":weather, "color":"#808080"}, "temperature":{"value":temperature, "color":"#002FA7"}, "air":{"value":airData+' '+airQuality, "color":air_color(airQuality)}, "love_days":{"value":get_count(), "color": '#D70000'}, "birthday_left":{"value":get_left(birthday), "color":'#FF69B4'}, "anniversary_left":{"value":get_left(anniversary), "color":'#FF69B4'}, "words":{"value":get_words(), "color":get_random_color()}}
+data = {"today":{"value":get_today(), "color":"	#FF69B4"}, "weather":{"value":weather, "color":"#808080"}, "temperature":{"value":temperature, "color":"#002FA7"}, "air":{"value":airData+' '+airQuality, "color":air_color(airQuality)}, "love_days":{"value":get_count(), "color": '#D70000'}, "birthday_left":{"value":get_left(birthday), "color":'#FF69B4'}, "anniversary_left":{"value":get_left(anniversary), "color":'#FF69B4'}, "words":{"value":get_words(), "color":get_random_color()}}
 res = wm.send_template(user_id, template_id, data)
 print(res)
