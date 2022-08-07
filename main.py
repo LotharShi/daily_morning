@@ -24,7 +24,7 @@ def get_weather():
   url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
   res = requests.get(url).json()
   weather = res['data']['list'][0]
-  return weather['weather'], str(math.floor(weather['high'])) + '~' + str(math.floor(weather['low'])) + '°C', weather['airData'], weather['airQuality']
+  return weather['weather'], str(math.floor(weather['low'])) + '~' + str(math.floor(weather['high'])) + '°C', weather['airData'], weather['airQuality']
 
 def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
@@ -66,6 +66,6 @@ client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
 weather, temperature, airData, airQuality = get_weather()
-data = {"today":{"value":get_today(), "color":"	#FF69B4"}, "weather":{"value":weather, "color":"#808080"}, "temperature":{"value":temperature, "color":"#002FA7"}, "air":{"value":airData+' '+airQuality, "color":air_color(airQuality)}, "love_days":{"value":get_count(), "color": '#D70000'}, "birthday_left":{"value":get_left(birthday), "color":'#FF69B4'}, "anniversary_left":{"value":get_left(anniversary), "color":'#FF69B4'}, "words":{"value":get_words(), "color":get_random_color()}}
+data = {"today":{"value":get_today(), "color":"#FFC0CB"}, "weather":{"value":weather, "color":"#808080"}, "temperature":{"value":temperature, "color":"#002FA7"}, "air":{"value":airData+' '+airQuality, "color":air_color(airQuality)}, "love_days":{"value":get_count(), "color": '#D70000'}, "birthday_left":{"value":get_left(birthday), "color":'#FF6347'}, "anniversary_left":{"value":get_left(anniversary), "color":'#FF69B4'}, "words":{"value":get_words(), "color":get_random_color()}}
 res = wm.send_template(user_id, template_id, data)
 print(res)
