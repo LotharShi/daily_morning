@@ -10,6 +10,7 @@ today = datetime.now()
 start_date = os.environ['START_DATE']
 city = os.environ['CITY']
 birthday = os.environ['BIRTHDAY']
+anniversary = os.environ['START_DATE'][5:]
 
 app_id = os.environ["APP_ID"]
 app_secret = os.environ["APP_SECRET"]
@@ -22,14 +23,14 @@ def get_weather():
   url = "http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=" + city
   res = requests.get(url).json()
   weather = res['data']['list'][0]
-  return weather['weather'], math.floor(weather['temp'])
+  return weather['weather'], str(math.floor(weather['high'])) + '~' + str(math.floor(weather['low'])) + '°C', weather['airData'], weather['airQuality']
 
 def get_count():
   delta = today - datetime.strptime(start_date, "%Y-%m-%d")
   return delta.days
 
-def get_birthday():
-  next = datetime.strptime(str(date.today().year) + "-" + birthday, "%Y-%m-%d")
+def get_left(theday):
+  next = datetime.strptime(str(date.today().year) + "-" + theday, "%Y-%m-%d")
   if next < datetime.now():
     next = next.replace(year=next.year + 1)
   return (next - today).days
@@ -43,11 +44,19 @@ def get_words():
 def get_random_color():
   return "#%06x" % random.randint(0, 0xFFFFFF)
 
+def air_color(q):
+    if q == '优':
+        return '#228B22'
+    elif q == '良':
+        return '#DAA520'
+    else :
+        return '#B22222'
+
 
 client = WeChatClient(app_id, app_secret)
 
 wm = WeChatMessage(client)
-wea, temperature = get_weather()
-data = {"weather":{"value":wea},"temperature":{"value":temperature},"love_days":{"value":get_count()},"birthday_left":{"value":get_birthday()},"words":{"value":get_words(), "color":get_random_color()}}
+weather, temperature, airData, airQuality = get_weather()
+data = {"weather":{"value":weather, "color":"#808080"}, "temperature":{"value":temperature, "color":"#002FA7"}, "air":{"value":airData+' '+airQuality, "color":air_color(airQuality)}, "love_days":{"value":get_count(), "color": '#D70000'}, "birthday_left":{"value":get_left(birthday), "color":'#FF69B4'}, "anniversary_left":{"value":get_left(anniversary), "color":'#FF69B4'}, "words":{"value":get_words(), "color":get_random_color()}}
 res = wm.send_template(user_id, template_id, data)
 print(res)
