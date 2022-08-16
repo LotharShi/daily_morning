@@ -35,7 +35,7 @@ def get_left(theday):
   next = datetime.strptime(str(today.year) + "-" + theday, "%Y-%m-%d")
   if next < datetime.now():
     next = next.replace(year=next.year + 1)
-  return (next - today + 1).days
+  return (next - today).days + 1
 
 def get_words():
   words = requests.get("https://api.shadiao.pro/chp")
